@@ -1,0 +1,191 @@
+/**
+ * PrivacyLens — Tokens & Base Stylesheet (tokens.css)
+ * 
+ * Category: Design Tokens, Base Setup & Ambient Canvas
+ * 
+ * Contents:
+ *  1. Typography Import (Inter & Outfit via Google Fonts)
+ *  2. Design Tokens (:root)
+ *     - Canvas & Void tones
+ *     - Aurora orb palette (violet, cyan, magenta)
+ *     - Glass surface tiers (Hero, Standard, Subtle fills/blurs/saturations)
+ *     - Typography scales & font families
+ *     - Semantics (Grade tiers, flags, confidence colors)
+ *     - Radii, shadows, and motion easing tokens
+ *  3. Global Reset & Popup Body Dimensions
+ *  4. Ambient Aurora Mesh (.bg-mesh, .orb-1, .orb-2, .orb-3) & Drift Keyframes
+ *  5. Reduced Motion fallbacks for ambient background
+ */
+
+/* ─── 1. Google Fonts ──────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap');
+
+/* ─── 2. Design Tokens ─────────────────────────────────────────────────────── */
+:root {
+  /* ── Canvas (the void behind the aurora) ────────────────────────────── */
+  --void: #05060d;
+  --void-2: #0a0c18;
+
+  /* ── Aurora orb colors — violet/cyan/magenta triad ─────────────────── */
+  --aurora-violet: #6d6af6;
+  --aurora-cyan: #29d6e8;
+  --aurora-magenta: #e94fb0;
+
+  /* ── Glass surface tiers ─────────────────────────────────────────────── */
+  --glass-hero-fill: rgba(255, 255, 255, 0.08);
+  --glass-hero-blur: 32px;
+  --glass-hero-sat: 200%;
+  --glass-standard-fill: rgba(255, 255, 255, 0.05);
+  --glass-standard-blur: 22px;
+  --glass-standard-sat: 160%;
+  --glass-subtle-fill: rgba(255, 255, 255, 0.035);
+  --glass-subtle-blur: 16px;
+  --glass-subtle-sat: 140%;
+
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-hero: rgba(255, 255, 255, 0.24);
+  --glass-edge-highlight: rgba(255, 255, 255, 0.35);
+
+  /* ── Text ────────────────────────────────────────────────────────────── */
+  --text-primary: #f8fafc;
+  --text-secondary: #a8b3c7;
+  --text-muted: #6b7690;
+
+  /* ── Brand accent ────────────────────────────────────────────────────── */
+  --accent: #6d6af6;
+  --accent-hover: #8b87ff;
+  --accent-glow: rgba(109, 106, 246, 0.4);
+
+  /* ── Flag semantics ──────────────────────────────────────────────────── */
+  --red: #fb7185;
+  --red-bg: rgba(251, 113, 133, 0.14);
+  --green: #34d399;
+  --green-bg: rgba(52, 211, 153, 0.14);
+  --yellow: #fbbf24;
+
+  /* ── Grade tiers ─────────────────────────────────────────────────────── */
+  --grade-excellent: #34d399;
+  --grade-good: #a3e635;
+  --grade-fair: #fbbf24;
+  --grade-poor: #fb923c;
+  --grade-bad: #fb7185;
+
+  /* ── Skeleton (loading state) ────────────────────────────────────────── */
+  --skeleton: rgba(255, 255, 255, 0.05);
+  --skeleton-shine: rgba(255, 255, 255, 0.09);
+
+  /* ── Radius ──────────────────────────────────────────────────────────── */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── */
+  --shadow-ambient: 0 12px 40px rgba(2, 3, 10, 0.55);
+  --shadow-hero-glow: 0 0 48px var(--accent-glow);
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --ease-glass: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 0.18s;
+  --dur-med: 0.32s;
+  --dur-slow: 0.6s;
+  --dur-ambient: 22s;
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-head: 'Outfit', sans-serif;
+
+  /* Legacy aliases for backward compatibility */
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-med: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── 3. Reset & Base ──────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 380px;
+  min-width: 380px;
+}
+
+body {
+  width: 380px;
+  min-width: 380px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: transparent;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── 4. Aurora Background Mesh ───────────────────────────────────────────── */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--void);
+}
+
+.bg-mesh .orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.orb-1 {
+  width: 260px;
+  height: 260px;
+  top: -80px;
+  left: -60px;
+  background: var(--aurora-violet);
+  animation: driftA var(--dur-ambient) ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 220px;
+  height: 220px;
+  top: 120px;
+  right: -80px;
+  background: var(--aurora-cyan);
+  animation: driftB calc(var(--dur-ambient) * 1.3) ease-in-out infinite;
+}
+
+.orb-3 {
+  width: 240px;
+  height: 240px;
+  bottom: -100px;
+  left: 40px;
+  background: var(--aurora-magenta);
+  animation: driftC calc(var(--dur-ambient) * 0.85) ease-in-out infinite;
+}
+
+@keyframes driftA {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(30px, 20px); }
+}
+
+@keyframes driftB {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(-25px, 25px); }
+}
+
+@keyframes driftC {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(15px, -20px); }
+}
+
+/* ─── 5. Reduced Motion Override ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .bg-mesh .orb {
+    animation: none;
+  }
+}

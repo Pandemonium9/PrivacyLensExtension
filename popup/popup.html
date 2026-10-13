@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrivacyLens</title>
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="components.css" />
+  <link rel="stylesheet" href="states.css" />
+</head>
+<body>
+
+<!-- Aurora background — always behind everything -->
+<div class="bg-mesh" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Top progress bar (analyzing animation) -->
+<div id="progress-bar"></div>
+
+<div class="popup-wrapper">
+
+  <!-- ─── Header ─────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="logo-mark" aria-hidden="true">
+      <!-- Lens SVG (replaces shield) -->
+      <svg class="lens lens--sm" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="lensGlass" cx="35%" cy="30%" r="75%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,0.85)"/>
+            <stop offset="45%"  stop-color="rgba(255,255,255,0.12)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+          </radialGradient>
+          <linearGradient id="lensRim" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#8b87ff"/>
+            <stop offset="100%" stop-color="#e94fb0"/>
+          </linearGradient>
+        </defs>
+        <circle class="lens-glass-circle" cx="19" cy="19" r="13" fill="url(#lensGlass)" stroke="url(#lensRim)" stroke-width="2.5"/>
+        <line x1="29" y1="29" x2="41" y2="41" stroke="url(#lensRim)" stroke-width="4" stroke-linecap="round"/>
+        <circle class="lens-glint" cx="14" cy="13" r="2.5" fill="rgba(255,255,255,0.9)"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="app-title">PrivacyLens</div>
+      <div class="domain-label" id="domain-label">—</div>
+    </div>
+    <div class="header-status">
+      <div class="spinner" id="header-spinner" aria-label="Loading…"></div>
+      <div class="status-dot" id="status-dot"></div>
+    </div>
+  </header>
+
+  <!-- ─── Content Area ──────────────────────────────────────────────────── -->
+  <div class="content-area">
+
+    <!-- STATE: Loading -->
+    <section id="state-loading" class="state-section" role="status" aria-label="Loading analysis">
+      <div class="card glass--subtle">
+        <div class="skeleton sk-line wide" style="margin-bottom:10px;height:14px"></div>
+        <div class="skeleton sk-line med"></div>
+        <div class="skeleton sk-line short" style="margin-bottom:14px"></div>
+        <div class="skeleton sk-block"></div>
+      </div>
+      <div class="card glass--subtle" style="margin-top:10px">
+        <div class="skeleton sk-line wide" style="height:30px;border-radius:6px"></div>
+      </div>
+    </section>
+
+    <!-- STATE: Not Analyzed -->
+    <section id="state-not-analyzed" class="state-section">
+      <div class="card glass--standard">
+        <!-- Large Lens replacing emoji -->
+        <div class="not-analyzed-icon" aria-hidden="true">
+          <svg class="lens lens--lg" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="lensGlassLg" cx="35%" cy="30%" r="75%">
+                <stop offset="0%"   stop-color="rgba(255,255,255,0.85)"/>
+                <stop offset="45%"  stop-color="rgba(255,255,255,0.12)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+              </radialGradient>
+              <linearGradient id="lensRimLg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="#8b87ff"/>
+                <stop offset="100%" stop-color="#e94fb0"/>
+              </linearGradient>
+            </defs>
+            <circle cx="19" cy="19" r="13" fill="url(#lensGlassLg)" stroke="url(#lensRimLg)" stroke-width="2.5"/>
+            <line x1="29" y1="29" x2="41" y2="41" stroke="url(#lensRimLg)" stroke-width="4" stroke-linecap="round"/>
+            <circle class="lens-glint" cx="14" cy="13" r="2.5" fill="rgba(255,255,255,0.9)"/>
+          </svg>
+        </div>
+        <h2 class="not-analyzed-title">No analysis yet</h2>
+        <p class="not-analyzed-subtitle">
+          We haven't analyzed the privacy policy for this site. Click below to analyze it now.
+        </p>
+
+        <!-- Detected policy URL hint -->
+        <div class="policy-url-hint" id="policy-url-hint" style="display:none">
+          <span class="policy-url-hint-label">Found:</span>
+          <span class="policy-url-hint-value" id="policy-url-hint-value"></span>
+        </div>
+
+        <!-- Manual URL input (shown when no URL auto-detected) -->
+        <div class="url-input-group" id="manual-url-group" style="display:none">
+          <input
+            type="url"
+            id="manual-policy-url"
+            placeholder="Paste privacy policy URL…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <button class="btn btn-primary" id="btn-analyze" type="button">
+          Analyze Policy
+        </button>
+      </div>
+    </section>
+
+    <!-- STATE: Analyzing -->
+    <section id="state-analyzing" class="state-section" role="status" aria-label="Analyzing privacy policy">
+      <div class="card glass--standard">
+        <!-- Analyzing header: lens + title inline -->
+        <div class="analyzing-header">
+          <span class="analyzing-lens-wrap" aria-hidden="true">
+            <svg class="lens lens--sm analyzing-lens" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="lensGlassAn" cx="35%" cy="30%" r="75%">
+                  <stop offset="0%"   stop-color="rgba(255,255,255,0.85)"/>
+                  <stop offset="45%"  stop-color="rgba(255,255,255,0.12)"/>
+                  <stop offset="100%" stop-color="rgba(255,255,255,0.02)"/>
+                </radialGradient>
+                <linearGradient id="lensRimAn" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#8b87ff"/>
+                  <stop offset="100%" stop-color="#e94fb0"/>
+                </linearGradient>
+              </defs>
+              <circle class="lens-glass-circle" cx="19" cy="19" r="13" fill="url(#lensGlassAn)" stroke="url(#lensRimAn)" stroke-width="2.5"/>
+              <line x1="29" y1="29" x2="41" y2="41" stroke="url(#lensRimAn)" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <div class="not-analyzed-title" style="margin-bottom:0; text-align:left;">Analyzing Policy…</div>
+        </div>
+        <div class="analyzing-steps">
+          <div class="step-item" id="step-1">
+            <div class="step-dot"></div>
+            <span class="step-label">Extracting page content</span>
+          </div>
+          <div class="step-item" id="step-2">
+            <div class="step-dot"></div>
+            <span class="step-label">Running AI analysis</span>
+          </div>
+          <div class="step-item" id="step-3">
+            <div class="step-dot"></div>
+            <span class="step-label">Verifying summary structure</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATE: Result -->
+    <section id="state-result" class="state-section">
+
+      <!-- Grade card — Hero tier, the "Lens" component -->
+      <div class="card glass--hero" style="padding: 16px 14px; text-align:center;">
+        <div class="grade-lens" id="grade-lens" data-tier="">
+          <div class="grade-lens-glow"></div>
+          <div class="grade-lens-glass">
+            <span class="grade-lens-letter" id="grade-value"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flag tabs card -->
+      <div class="card glass--standard" style="margin-top:10px;">
+        <div class="tabs-row">
+          <button class="tab-btn active-red" id="tab-red" type="button" aria-selected="true">
+            🔴 Red Flags <span class="badge" id="red-count">0</span>
+          </button>
+          <button class="tab-btn" id="tab-green" type="button" aria-selected="false">
+            🟢 Green Flags <span class="badge" id="green-count">0</span>
+          </button>
+        </div>
+
+        <!-- Red flags panel -->
+        <div class="tab-panel visible" id="panel-red" role="tabpanel">
+          <ul class="flags-list" id="red-flags-list"></ul>
+          <p class="no-flags" id="red-no-flags" style="display:none">No significant concerns found.</p>
+        </div>
+
+        <!-- Green flags panel -->
+        <div class="tab-panel" id="panel-green" role="tabpanel">
+          <ul class="flags-list" id="green-flags-list"></ul>
+          <p class="no-flags" id="green-no-flags" style="display:none">No user-protective practices found.</p>
+        </div>
+      </div>
+
+      <!-- Summary card -->
+      <div class="card glass--standard" id="summary-card" style="margin-top:10px;">
+        <p class="summary-text" id="summary-text"></p>
+        <div class="confidence-row">
+          <span class="confidence-label">AI Confidence</span>
+          <span class="confidence-pill" id="confidence-pill"></span>
+        </div>
+      </div>
+
+      <!-- Metadata row -->
+      <div class="meta-row">
+        <span class="meta-item">Status: <span id="review-status-label">AI</span></span>
+        <span class="meta-item">Updated: <span id="updated-at-label">—</span></span>
+        <button class="btn btn-secondary" id="btn-reanalyze" type="button" style="width:auto;padding:5px 12px;font-size:11px">
+          Re-analyze
+        </button>
+      </div>
+    </section>
+
+    <!-- STATE: Error -->
+    <section id="state-error" class="state-section">
+      <div class="card glass--subtle error-card">
+        <div class="error-icon" aria-hidden="true">⚠️</div>
+        <h2 class="error-title">Something went wrong</h2>
+        <p class="error-message" id="error-message"></p>
+        <button class="btn btn-primary" id="btn-retry" type="button">Retry</button>
+      </div>
+    </section>
+
+    <!-- STATE: Unsupported -->
+    <section id="state-unsupported" class="state-section">
+      <div class="card glass--subtle unsupported-card">
+        <div class="unsupported-icon" aria-hidden="true">🛡️</div>
+        <h2 class="unsupported-title">PrivacyLens inactive</h2>
+        <p class="unsupported-msg">
+          This type of page isn't supported. Visit a public website to analyze their privacy policy.
+        </p>
+      </div>
+    </section>
+
+  </div><!-- /.content-area -->
+
+  <!-- Footer disclaimer (shown only in result state) -->
+  <footer class="disclaimer" id="footer-disclaimer">
+    AI-generated summary · Not legal advice · May not reflect latest policy
+  </footer>
+
+</div><!-- /.popup-wrapper -->
+
+<!-- popup.js loaded last so DOM is ready -->
+<script src="popup.js"></script>
+</body>
+</html>

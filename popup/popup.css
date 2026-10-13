@@ -1,0 +1,14 @@
+/**
+ * PrivacyLens — Master Popup Stylesheet (popup.css)
+ * 
+ * This file serves as the unified entry point for all popup styles.
+ * It imports the modular category stylesheets:
+ * 
+ *  1. tokens.css     — Fonts, design tokens (:root), canvas reset & ambient aurora background mesh.
+ *  2. components.css — Glass surface hierarchy, signature Lens SVG, header, buttons, inputs & status widgets.
+ *  3. states.css     — State layouts (loading, not-analyzed, analyzing, result with Grade Lens, error, unsupported).
+ */
+
+@import url('tokens.css');
+@import url('components.css');
+@import url('states.css');

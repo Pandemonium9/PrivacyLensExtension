@@ -1,0 +1,364 @@
+/**
+ * PrivacyLens — Reusable Components Stylesheet (components.css)
+ * 
+ * Category: Core Glass Surfaces & Reusable UI Components
+ * 
+ * Contents:
+ *  1. Glass Surface System
+ *     - Base glass container with top-edge highlight (.glass)
+ *     - Tier variants (.glass--hero, .glass--standard, .glass--subtle)
+ *     - Backward-compatible .card integration
+ *  2. Signature Lens SVG & Motif (.lens, .lens--sm, .lens--lg, .lens-glint)
+ *  3. Header Layout & 3D Interactive Logo Mark (.header, .logo-mark, .app-title, .domain-label)
+ *  4. Top Progress Bar & Status Indicators (#progress-bar, .spinner, .status-dot)
+ *  5. Reusable Buttons (.btn, .btn-primary, .btn-secondary, :hover, :focus-visible)
+ *  6. URL Input Group (.url-input-group, glass-subtle inputs, focus rings)
+ */
+
+/* ─── 1. Glass Surface System ─────────────────────────────────────────────── */
+.glass {
+  position: relative;
+  background: var(--glass-standard-fill);
+  backdrop-filter: blur(var(--glass-standard-blur)) saturate(var(--glass-standard-sat));
+  -webkit-backdrop-filter: blur(var(--glass-standard-blur)) saturate(var(--glass-standard-sat));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-ambient);
+  transition: transform var(--dur-fast) var(--ease-glass), box-shadow var(--dur-fast) var(--ease-glass);
+}
+
+/* Top-edge light catch — the highlight detail that sells translucent glass */
+.glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg, var(--glass-edge-highlight), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.glass:hover {
+  transform: translateY(-1px);
+}
+
+.glass--hero {
+  background: var(--glass-hero-fill);
+  backdrop-filter: blur(var(--glass-hero-blur)) saturate(var(--glass-hero-sat));
+  -webkit-backdrop-filter: blur(var(--glass-hero-blur)) saturate(var(--glass-hero-sat));
+  border-color: var(--glass-border-hero);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-ambient), var(--shadow-hero-glow);
+}
+
+.glass--standard {
+  background: var(--glass-standard-fill);
+  backdrop-filter: blur(var(--glass-standard-blur)) saturate(var(--glass-standard-sat));
+  -webkit-backdrop-filter: blur(var(--glass-standard-blur)) saturate(var(--glass-standard-sat));
+  border-color: var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.glass--subtle {
+  background: var(--glass-subtle-fill);
+  backdrop-filter: blur(var(--glass-subtle-blur)) saturate(var(--glass-subtle-sat));
+  -webkit-backdrop-filter: blur(var(--glass-subtle-blur)) saturate(var(--glass-subtle-sat));
+  border-color: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+/* ─── Card (Legacy class aliased to standard glass surface) ───────────────── */
+.card {
+  background: var(--glass-standard-fill);
+  backdrop-filter: blur(var(--glass-standard-blur)) saturate(var(--glass-standard-sat));
+  -webkit-backdrop-filter: blur(var(--glass-standard-blur)) saturate(var(--glass-standard-sat));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-ambient);
+  position: relative;
+  transition: transform var(--dur-fast) var(--ease-glass), box-shadow var(--dur-fast) var(--ease-glass);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(180deg, var(--glass-edge-highlight), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+}
+
+.card + .card {
+  margin-top: 10px;
+}
+
+.card.glass--hero {
+  background: var(--glass-hero-fill);
+  backdrop-filter: blur(var(--glass-hero-blur)) saturate(var(--glass-hero-sat));
+  -webkit-backdrop-filter: blur(var(--glass-hero-blur)) saturate(var(--glass-hero-sat));
+  border-color: var(--glass-border-hero);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-ambient), var(--shadow-hero-glow);
+}
+
+.card.glass--subtle {
+  background: var(--glass-subtle-fill);
+  backdrop-filter: blur(var(--glass-subtle-blur)) saturate(var(--glass-subtle-sat));
+  -webkit-backdrop-filter: blur(var(--glass-subtle-blur)) saturate(var(--glass-subtle-sat));
+  border-color: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+/* ─── 2. Signature Lens SVG Component ─────────────────────────────────────── */
+.lens {
+  display: block;
+  overflow: visible;
+}
+
+.lens--sm {
+  width: 28px;
+  height: 28px;
+}
+
+.lens--lg {
+  width: 56px;
+  height: 56px;
+}
+
+/* Ambient glint sweep on header lens */
+.lens-glint {
+  animation: lensGlint 5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes lensGlint {
+  0%, 85%, 100% { opacity: 0; transform: translate(0, 0); }
+  90%           { opacity: 1; transform: translate(6px, 6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lens-glint {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ─── 3. Header & 3D Interactive Logo Mark ────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--glass-border);
+  position: relative;
+}
+
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform-style: preserve-3d;
+  transition: transform var(--dur-med) var(--ease-glass);
+  transform: perspective(300px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg));
+  cursor: default;
+}
+
+.header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-title {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.domain-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 230px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── 4. Progress Bar & Status Indicators ─────────────────────────────────── */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--aurora-violet), var(--aurora-cyan), var(--aurora-violet));
+  background-size: 200% 100%;
+  border-radius: 0 2px 2px 0;
+  z-index: 999;
+  transition: width 0.5s ease;
+  display: none;
+}
+
+#progress-bar.active {
+  display: block;
+  animation: progressSweep 1.8s ease-in-out infinite;
+}
+
+@keyframes progressSweep {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: -200% 0%; }
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--glass-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+
+.spinner.visible {
+  display: block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: none;
+}
+
+.status-dot.visible    { display: block; }
+.status-dot.dot-cached { background: var(--green); }
+.status-dot.dot-fresh  { background: var(--accent); }
+
+/* ─── 5. Reusable Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: transform var(--dur-fast) var(--ease-glass),
+              box-shadow var(--dur-fast) var(--ease-glass),
+              background var(--dur-fast) var(--ease-glass),
+              opacity var(--dur-fast) var(--ease-glass);
+  width: 100%;
+  letter-spacing: 0.01em;
+  position: relative;
+  z-index: 0;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  color: #fff;
+  box-shadow: 0 2px 16px var(--accent-glow);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-hover), #8b5cf6);
+  box-shadow: 0 4px 24px rgba(109, 106, 246, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--glass-subtle-fill);
+  backdrop-filter: blur(var(--glass-subtle-blur));
+  -webkit-backdrop-filter: blur(var(--glass-subtle-blur));
+  color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* ─── 6. URL Input Group ─────────────────────────────────────────────────── */
+.url-input-group {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.url-input-group input {
+  flex: 1;
+  background: var(--glass-subtle-fill);
+  backdrop-filter: blur(var(--glass-subtle-blur)) saturate(var(--glass-subtle-sat));
+  -webkit-backdrop-filter: blur(var(--glass-subtle-blur)) saturate(var(--glass-subtle-sat));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-glass),
+              box-shadow var(--dur-fast) var(--ease-glass);
+}
+
+.url-input-group input:focus {
+  border-color: rgba(109, 106, 246, 0.5);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.url-input-group input:focus-visible {
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.url-input-group input::placeholder {
+  color: var(--text-muted);
+}
